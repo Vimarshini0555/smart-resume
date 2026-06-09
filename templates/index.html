@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume Analyzer & ATS Optimizer</title>
+    <!-- Google Fonts: Outfit for headers, Inter for UI text -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Floating background glowing ambient blobs -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+    <div class="app-container">
+        <!-- Main Header -->
+        <header class="main-header">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <i data-lucide="cpu" class="neon-glow-violet"></i>
+                </div>
+                <div>
+                    <h1>Resu<span class="gradient-text">Genius</span></h1>
+                    <p class="tagline">AI-Powered Resume Analyzer & ATS Optimizer</p>
+                </div>
+            </div>
+            <div class="header-badges">
+                <span class="glass-badge"><i data-lucide="shield-check" size="14"></i> In-Memory Processing (Secure)</span>
+                <span class="glass-badge"><i data-lucide="sparkles" size="14"></i> Powered by NLP</span>
+            </div>
+        </header>
+
+        <!-- Main Layout Split -->
+        <main class="main-layout">
+            
+            <!-- Left Side: Inputs Panel -->
+            <section class="inputs-panel glass-card">
+                <div class="card-header">
+                    <i data-lucide="file-up" class="header-icon cyan-icon"></i>
+                    <div>
+                        <h2>Upload Resume</h2>
+                        <p class="subtitle">Upload your CV in PDF format to start scanning</p>
+                    </div>
+                </div>
+
+                <form id="analyze-form" enctype="multipart/form-data">
+                    <!-- Custom Drag & Drop File Container -->
+                    <div class="drag-drop-zone" id="drop-zone">
+                        <input type="file" id="resume-file" name="resume" accept=".pdf" class="hidden-input">
+                        <div class="drop-zone-content">
+                            <div class="drop-icon-wrapper">
+                                <i data-lucide="upload-cloud" class="drop-icon pulse-animation"></i>
+                            </div>
+                            <h3>Drag and drop your PDF resume here</h3>
+                            <p class="file-limits">Or <span class="highlight-action">browse files</span> from your computer</p>
+                            <p class="file-spec">Supports PDF formats up to 16MB</p>
+                        </div>
+                        <!-- File Selection Status -->
+                        <div class="file-status hidden" id="file-status">
+                            <i data-lucide="file-text" class="status-file-icon"></i>
+                            <div class="file-details">
+                                <span class="file-name" id="selected-file-name">filename.pdf</span>
+                                <span class="file-size" id="selected-file-size">1.2 MB</span>
+                            </div>
+                            <button type="button" class="remove-file-btn" id="remove-file-btn" title="Remove file">
+                                <i data-lucide="x" size="16"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Target Job Description (Optional) -->
+                    <div class="jd-section">
+                        <div class="jd-header">
+                            <div class="jd-title-area">
+                                <i data-lucide="briefcase" class="jd-icon"></i>
+                                <h3>Target Job Description <span class="badge-optional">Optional</span></h3>
+                            </div>
+                            <span class="char-counter" id="char-counter">0 chars</span>
+                        </div>
+                        <p class="jd-desc">Pasting the target job description unlocks custom ATS keyword matching and role-specific skill optimization analysis.</p>
+                        <div class="textarea-wrapper">
+                            <textarea id="job-description" name="job_description" placeholder="Paste the job requirements, duties, or skills here to compare overlap..."></textarea>
+                            <div class="textarea-glow"></div>
+                        </div>
+                    </div>
+
+                    <!-- Action Trigger -->
+                    <button type="submit" class="submit-btn disabled" id="submit-btn" disabled>
+                        <span>Analyze Resume</span>
+                        <i data-lucide="arrow-right" class="arrow-icon"></i>
+                    </button>
+                </form>
+
+                <!-- Processing Overlay / Progress State -->
+                <div class="processing-state hidden" id="processing-state">
+                    <div class="spinner-container">
+                        <div class="outer-ring"></div>
+                        <div class="inner-ring"></div>
+                        <div class="core-spark">
+                            <i data-lucide="scan-eye" class="scanning-icon"></i>
+                        </div>
+                    </div>
+                    <h3>Parsing Resume Content...</h3>
+                    <p class="processing-detail" id="processing-step">Extracting PDF text layers and initializing NLP engine...</p>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" id="progress-bar"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Side: Dashboard / Results Panel -->
+            <section class="results-panel" id="results-panel">
+                
+                <!-- Initial Welcome State (Placeholder before analysis) -->
+                <div class="welcome-placeholder glass-card" id="welcome-placeholder">
+                    <div class="placeholder-icon-wrapper">
+                        <i data-lucide="search-code" class="placeholder-icon floating-animation"></i>
+                    </div>
+                    <h2>Awaiting Your Resume</h2>
+                    <p>Upload your PDF resume and optionally paste a job description. Our advanced NLP engine will parse, categorize, score, and provide deep insights to help you land more interviews.</p>
+                    <div class="placeholder-features">
+                        <div class="p-feature">
+                            <i data-lucide="gauge" class="feat-icon p-violet"></i>
+                            <h4>ATS Score Gauge</h4>
+                        </div>
+                        <div class="p-feature">
+                            <i data-lucide="layout-list" class="feat-icon p-cyan"></i>
+                            <h4>Section Checklist</h4>
+                        </div>
+                        <div class="p-feature">
+                            <i data-lucide="terminal" class="feat-icon p-pink"></i>
+                            <h4>Skill Classification</h4>
+                        </div>
+                        <div class="p-feature">
+                            <i data-lucide="check-square" class="feat-icon p-green"></i>
+                            <h4>Keyword Matcher</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actual Interactive Dashboard (Hidden initially) -->
+                <div class="dashboard-content hidden" id="dashboard-content">
+                    
+                    <!-- Top Summary Row: ATS Score & Basic Info Card -->
+                    <div class="summary-grid">
+                        
+                        <!-- Score Radial Card -->
+                        <div class="score-card glass-card">
+                            <div class="radial-gauge-container">
+                                <svg class="radial-gauge" viewBox="0 0 120 120">
+                                    <circle class="gauge-bg" cx="60" cy="60" r="50"></circle>
+                                    <circle class="gauge-fill" id="score-gauge-fill" cx="60" cy="60" r="50" stroke-dasharray="314.16" stroke-dashoffset="314.16"></circle>
+                                </svg>
+                                <div class="gauge-center-text">
+                                    <span class="score-number" id="score-display">0</span>
+                                    <span class="score-total">/100</span>
+                                </div>
+                            </div>
+                            <div class="score-rating">
+                                <h3 id="score-rating-text">Awaiting Analysis</h3>
+                                <p id="score-rating-desc">Optimizing your ATS match rate increases callbacks.</p>
+                            </div>
+                        </div>
+
+                        <!-- Candidate Quick Info Glass Card -->
+                        <div class="info-card glass-card">
+                            <div class="card-header-compact">
+                                <span class="tag-meta" id="resume-filename-tag">resume.pdf</span>
+                                <h3 class="info-card-title" id="info-name">Candidate Details</h3>
+                            </div>
+                            <div class="contact-grid">
+                                <div class="contact-item" id="info-email-item">
+                                    <div class="contact-icon-box"><i data-lucide="mail" size="16"></i></div>
+                                    <div class="contact-text-box">
+                                        <span class="contact-label">Email Address</span>
+                                        <span class="contact-value" id="info-email">Not Found</span>
+                                    </div>
+                                </div>
+                                <div class="contact-item" id="info-phone-item">
+                                    <div class="contact-icon-box"><i data-lucide="phone" size="16"></i></div>
+                                    <div class="contact-text-box">
+                                        <span class="contact-label">Phone Number</span>
+                                        <span class="contact-value" id="info-phone">Not Found</span>
+                                    </div>
+                                </div>
+                                <div class="contact-item" id="info-linkedin-item">
+                                    <div class="contact-icon-box"><i data-lucide="linkedin" size="16"></i></div>
+                                    <div class="contact-text-box">
+                                        <span class="contact-label">LinkedIn</span>
+                                        <span class="contact-value" id="info-linkedin">Not Listed</span>
+                                    </div>
+                                </div>
+                                <div class="contact-item" id="info-github-item">
+                                    <div class="contact-icon-box"><i data-lucide="github" size="16"></i></div>
+                                    <div class="contact-text-box">
+                                        <span class="contact-label">GitHub / Portfolio</span>
+                                        <span class="contact-value" id="info-github">Not Listed</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Checklist: Essential Resume Sections -->
+                    <div class="sections-card glass-card">
+                        <div class="section-title-box">
+                            <i data-lucide="layout-grid" class="sub-header-icon cyan-icon"></i>
+                            <div>
+                                <h3>Essential Resume Sections</h3>
+                                <p class="sub-desc">ATS screeners need standardized sections to parse data correctly</p>
+                            </div>
+                        </div>
+                        <div class="checklist-grid" id="checklist-grid">
+                            <!-- Injected by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Job Match Analytics (Only visible if JD was provided) -->
+                    <div class="jd-match-card glass-card hidden" id="jd-match-card">
+                        <div class="jd-match-header">
+                            <div class="section-title-box">
+                                <i data-lucide="sliders" class="sub-header-icon pink-icon"></i>
+                                <div>
+                                    <h3>Target Job Matching Analytics</h3>
+                                    <p class="sub-desc">Comparison of resume terms against target job description</p>
+                                </div>
+                            </div>
+                            <div class="match-badge-box">
+                                <span class="match-score-badge" id="jd-match-badge">95% Match</span>
+                            </div>
+                        </div>
+                        
+                        <div class="jd-analysis-grid">
+                            <!-- Matched vs Missing Skills Row -->
+                            <div class="jd-col">
+                                <h4>Matched Skills from JD <span class="badge-count count-green" id="jd-matched-skills-count">0</span></h4>
+                                <div class="pills-container" id="jd-matched-skills">
+                                    <!-- Injected by JavaScript -->
+                                </div>
+                            </div>
+                            <div class="jd-col">
+                                <h4>Missing Core Skills <span class="badge-count count-red" id="jd-missing-skills-count">0</span></h4>
+                                <div class="pills-container" id="jd-missing-skills">
+                                    <!-- Injected by JavaScript -->
+                                </div>
+                            </div>
+                            
+                            <!-- Matched vs Missing Keywords Row -->
+                            <div class="jd-col col-span-2">
+                                <hr class="divider">
+                            </div>
+                            
+                            <div class="jd-col">
+                                <h4>Matched Industry Keywords <span class="badge-count count-green" id="jd-matched-keywords-count">0</span></h4>
+                                <div class="pills-container" id="jd-matched-keywords">
+                                    <!-- Injected by JavaScript -->
+                                </div>
+                            </div>
+                            <div class="jd-col">
+                                <h4>Missing Contextual Keywords <span class="badge-count count-red" id="jd-missing-keywords-count">0</span></h4>
+                                <div class="pills-container" id="jd-missing-keywords">
+                                    <!-- Injected by JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Skills Categorization & Cloud -->
+                    <div class="skills-card glass-card">
+                        <div class="section-title-box">
+                            <i data-lucide="binary" class="sub-header-icon violet-icon"></i>
+                            <div>
+                                <h3>Extracted Technical Competencies</h3>
+                                <p class="sub-desc">Skills classified dynamically using NLP rule-based extraction</p>
+                            </div>
+                        </div>
+                        <div class="skills-category-grid" id="skills-category-grid">
+                            <!-- Injected by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Career & Academic Profile Card -->
+                    <div class="profile-card glass-card">
+                        <div class="section-title-box">
+                            <i data-lucide="user-check" class="sub-header-icon green-icon"></i>
+                            <div>
+                                <h3>NLP Career & Academic Profile</h3>
+                                <p class="sub-desc">Deep entity extraction of schools, degrees, and companies via spaCy NER</p>
+                            </div>
+                        </div>
+                        <div class="profile-details-grid">
+                            <div class="profile-col">
+                                <div class="profile-sub-header">
+                                    <i data-lucide="graduation-cap" class="profile-sub-icon"></i>
+                                    <h4>Education & Degrees</h4>
+                                </div>
+                                <div class="profile-data-box">
+                                    <div class="profile-label-small">Degrees Detected:</div>
+                                    <div class="pills-container" id="profile-degrees">
+                                        <!-- Injected by JavaScript -->
+                                    </div>
+                                    <div class="profile-label-small mt-3">Institutions & Universities:</div>
+                                    <div class="pills-container" id="profile-institutions">
+                                        <!-- Injected by JavaScript -->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="profile-col">
+                                <div class="profile-sub-header">
+                                    <i data-lucide="building-2" class="profile-sub-icon"></i>
+                                    <h4>Experience & Employment</h4>
+                                </div>
+                                <div class="profile-data-box">
+                                    <div class="profile-label-small">Experience Summary:</div>
+                                    <div id="profile-exp-years" class="experience-val-highlight">Analyzing...</div>
+                                    <div class="profile-label-small mt-3">Past Organizations & Employers:</div>
+                                    <div class="pills-container" id="profile-companies">
+                                        <!-- Injected by JavaScript -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Suggestions & Actionable Tips -->
+                    <div class="suggestions-card glass-card">
+                        <div class="section-title-box">
+                            <i data-lucide="lightbulb" class="sub-header-icon gold-icon"></i>
+                            <div>
+                                <h3>Actionable Recommendations</h3>
+                                <p class="sub-desc">Direct improvements based on structure, writing density, and JD overlap</p>
+                            </div>
+                        </div>
+                        <div class="suggestions-list" id="suggestions-list">
+                            <!-- Injected by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Raw Text Drawer -->
+                    <div class="drawer-card glass-card">
+                        <button class="drawer-trigger" id="drawer-trigger">
+                            <div class="drawer-trigger-title">
+                                <i data-lucide="file-code-2" size="18"></i>
+                                <span>Parsed Text Preview</span>
+                            </div>
+                            <i data-lucide="chevron-down" class="chevron-icon" id="drawer-chevron"></i>
+                        </button>
+                        <div class="drawer-content hidden" id="drawer-content">
+                            <pre class="raw-text-block" id="raw-text-preview"></pre>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+        </main>
+        
+        <footer class="app-footer">
+            <p>&copy; 2026 ResuGenius AI. Built with Python, Flask, spaCy, and PyPDF. Files processed in-memory for absolute privacy.</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
